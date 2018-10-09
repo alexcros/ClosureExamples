@@ -110,7 +110,7 @@ let clausuras = [f, // los tipos infieren
 
 
 
-// CLOUSURES
+// CLOUSURES ? ->mbloques en obj c
 // argumento de funciones y metodos
 // hay metodos que nos preguntan a traves de clousure
 // Como lo hago: sort, filter
