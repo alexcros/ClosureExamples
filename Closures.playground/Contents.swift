@@ -1,39 +1,59 @@
 import UIKit
 
-// sintaxis normal
+// normal syntax
 var operacion: (Int, Int) -> Int
 
 operacion = { (a:Int, b:Int) in return a + b }
 
 let suma = operacion(1,2)
 
-// como es variable se puede cambiar
+// sin inferencia
+operacion = { (a: Int,b: Int) in return a * b }
 
+// Swift deduce tipos: inferencia de tipos, linea 4
 operacion = { a,b in return a * b }
 
+// cmd + option [ ] move
 operacion = { a,b in
-	let suma = a + b
-	return suma
+    let suma = a + b
+    return suma
 }
 
+// cuando un closure tiene una unica linea de codigo, podemos eliminar el estamento "return"
 operacion = { a,b in a * 2 * b }
 
 operacion(2,5)
 
+// Swift ofrece una wildcard para utilizar como argumento
+// usando el caracter dolar, y enumerandolos de 0 en adelante, estos son:
+// $0, $1, $2, ... NESTED (anidadas)
+// Swift interpretara $0 como el primer argumento de nuestro closure (como "a") y $1
+// como el segundo (como "b"(, de esta forma nos ahorramos los argumentos y de regalo el "in",
+// quedando la closure como:
 operacion = { $0 + 2 * $1 }
 
 operacion(1,6)
 
-// Typealias
-
+// Typealias: añadimos un alias al tipo primitivo
+//
 typealias IntToInt = (Int)->Int
 
 typealias Longitude = Float
 
+// parametro y parametro interno
+
+// NO
+//func getDistance(from: Longitude) {
+//    _ = from * 2
+//}
+
+// SI
 func getDistance(from longitude: Longitude) {
 	_ = longitude * 2
 }
 
+// funcion interna de primer orden (funcion dentro otra fucnion)
+// evitar funciones chiquititas dentro de una clase, utilizar dentro de la funcion que la usa
 func adder(n: Int) -> IntToInt {
 	func foo(x:Int) -> Int {
 		return x + n
@@ -44,13 +64,14 @@ func adder(n: Int) -> IntToInt {
 let g = adder(n: 57)
 g(4)
 
+// parametro entrada, (closure, Int)
 func apply(f: IntToInt, n: Int) -> Int {
 	return f(n)
 }
 
 apply(f: g, n: 99)
 
-// sintaxis de clausuras
+// clousure sintaxi
 func f(_ n: Int) -> Int {
 	return n + 1
 }
@@ -70,22 +91,40 @@ for fn in funciones {
 	dump(fn(42))
 }
 
+// ventaja: rapido, no crea variable intermedia desventaja: pero no lo puedes parar
 funciones.forEach({ dump($0(42))})
 
-let clausuras = [f,
+let clausuras = [f, // los tipos infieren
 				 {(n: Int) in return n+1},
 				 {n in return n*3 },
 				 {n in n * 6},
 				 {$0 + 99}
 ]
-
 //sintaxis ultra-minimalista, se usa mucho en Swift, especialmente como clausuras de finalización, (callbacks)
 
-let evens = [6,12,2,8,4,10]
+// cuando el parametro termina siendo un clousure se le llama trailing-clousure (clausura cola)
+//let ejemplo = operateTwoInts(a:2,b:6, operation: {$0,$1})
 
+// podemos expresarlo tambien como: (mas corto)
+//let result = operateTwoInts(a:2,b:6) {$0,$1}
+
+
+
+// CLOUSURES
+// argumento de funciones y metodos
+// hay metodos que nos preguntan a traves de clousure
+// Como lo hago: sort, filter
+// Que hacer con: He descargado todo esto, que hago con el?
+// otros dicen: Ya he acabado, hago algo mas?
+//(estos le dan el nombre)
+
+//sintaxis ultra-minimalista, se usa mucho en Swift, especialmente como clausuras de finalización, (callbacks)
+let evens = [6,12,2,8,4,10]
+// ciclo de retencion de codigo (cuidado con clousures)
+                                // clousure
 let result1 = evens.sorted(by: {(a:Int, b: Int) in a > b})
 print(result1)
-
+                            // trailing clousure (unique)
 let result2 = evens.sorted { (a, b) in
 	return (a>b)
 }
@@ -93,6 +132,23 @@ print(result2)
 
 let result3 = evens.sorted { $0 > $1 }
 print(result3)
+
+// Closure are ARC Objects, or just objects
+
+// ARC RULES
+// Struct y Enum son "value types", son tipos que se pasan por valores, cada vez que
+// pasamos una variable Struct a una funcion esta crea su propia copia de valor. Cuando la
+// funcion termina la copia del valor es eliminada
+
+// Class es "reference type", se pasa por referencia, cada vez que pasamos una variable
+// Class a una funcion esta crea una referencia que apunta a dicha clase. ARC cuenta
+// automaticamente cuantas referencias estan apuntando a una variable tipo Class, cuando no
+// hay ninguna, elimina la variable Class (el objeto)
+
+// ARC Y la lista de captura
+// referencia weak. lo resolveremos de forma analoga, usando la lista de captura
+// (evitar memory leaks)
+// la lista de captura tambien no servira para definir como queremos capturar las "value types"
 
 // Genericos
 
